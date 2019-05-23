@@ -102,6 +102,7 @@ impl Bulb {
         };
 
         self.power_level.check(socket, &opts)?;
+        self.color.check(socket, &opts)?;
 
         Ok(())
     }
