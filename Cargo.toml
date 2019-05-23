@@ -1,0 +1,9 @@
+[package]
+name = "lifx_lan"
+version = "0.1.0"
+authors = ["succcubbus <jannis.kaiser2@gmail.com"]
+edition = "2018"
+
+[dependencies]
+lifx-core = "0.2.0"
+failure = "0.1.5"
