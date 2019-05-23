@@ -3,6 +3,9 @@ use lifx_core::{BuildOptions, Message, PowerLevel, RawMessage, HSBK};
 use std::net::{SocketAddr, UdpSocket};
 use std::time::{Duration, Instant};
 
+// random unique client identifier
+const CLIENT_IDENTIFIER: u32 = 646_994_787;
+
 type BoxUpdateFn<T> = Box<dyn FnMut(&UdpSocket, &BuildOptions, Option<&T>) -> Result<(), Error>>;
 
 struct RefreshableData<T> {
@@ -59,15 +62,21 @@ impl Bulb {
             target,
             addr,
             power_level: RefreshableData::with_config(short, move |socket, opts, _| {
-                Bulb::request_update(socket, opts, &addr, Message::GetPower)
+                Self::request_update(socket, opts, &addr, Message::GetPower)
             }),
             color: RefreshableData::with_config(short, move |socket, opts, color| match color {
                 Some(Color::Single(_)) => {
-                    Bulb::request_update(socket, opts, &addr, Message::GetPower)
+                    Self::request_update(socket, opts, &addr, Message::LightGet)
                 }
-                Some(Color::Multi(_)) => {
-                    Bulb::request_update(socket, opts, &addr, Message::GetPower)
-                }
+                Some(Color::Multi(_)) => Self::request_update(
+                    socket,
+                    opts,
+                    &addr,
+                    Message::GetColorZones {
+                        start_index: 0,
+                        end_index: 255,
+                    },
+                ),
                 None => Ok(()),
             }),
         }
@@ -79,7 +88,7 @@ impl Bulb {
         addr: &SocketAddr,
         msg: Message,
     ) -> Result<(), Error> {
-        socket.send_to(&RawMessage::build(opts, msg.clone())?.pack()?, addr)?;
+        socket.send_to(&RawMessage::build(opts, msg)?.pack()?, addr)?;
 
         Ok(())
     }
@@ -88,8 +97,8 @@ impl Bulb {
         let opts = BuildOptions {
             target: Some(self.target),
             res_required: true,
-            source: 12_345_678,
-            ..Default::default()
+            source: CLIENT_IDENTIFIER,
+            ..BuildOptions::default()
         };
 
         self.power_level.check(socket, &opts)?;
