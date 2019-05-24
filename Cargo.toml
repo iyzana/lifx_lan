@@ -1,5 +1,5 @@
 [package]
-name = "lifx_lan"
+name = "lifx-lan"
 version = "0.1.0"
 authors = ["succcubbus <jannis.kaiser2@gmail.com"]
 edition = "2018"
