@@ -16,17 +16,17 @@ pub struct Bulb {
     port: u32,
     target: u64,
     addr: SocketAddr,
-    name: RefreshableData<String, &RefreshOpts<'static>>,
-    power_level: RefreshableData<PowerLevel, &RefreshOpts<'static>>,
-    color: RefreshableData<Color, &RefreshOpts<'static>>,
-    model: RefreshableData<(u32, u32), &RefreshOpts<'static>>,
-    location: RefreshableData<String, &RefreshOpts<'static>>,
-    host_firmware: RefreshableData<u32, &RefreshOpts<'static>>,
-    wifi_firmware: RefreshableData<u32, &RefreshOpts<'static>>,
+    name: RefreshableData<String, RefreshOpts>,
+    power_level: RefreshableData<PowerLevel, RefreshOpts>,
+    color: RefreshableData<Color, RefreshOpts>,
+    model: RefreshableData<(u32, u32), RefreshOpts>,
+    location: RefreshableData<String, RefreshOpts>,
+    host_firmware: RefreshableData<u32, RefreshOpts>,
+    wifi_firmware: RefreshableData<u32, RefreshOpts>,
 }
 
-struct RefreshOpts<'a> {
-    socket: &'a UdpSocket,
+struct RefreshOpts {
+    socket: UdpSocket,
     build_opts: BuildOptions,
     addr: SocketAddr,
 }
@@ -92,7 +92,7 @@ impl Bulb {
             ..BuildOptions::default()
         };
         let refresh_opts = RefreshOpts {
-            socket,
+            socket: socket.try_clone().unwrap(),
             build_opts,
             addr: self.addr,
         };
