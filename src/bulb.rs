@@ -83,7 +83,6 @@ impl Bulb {
         Ok(())
     }
 
-    // relevant playground: https://play.rust-lang.org/?version=stable&mode=debug&edition=2018&gist=affc7947fe6c16d0c947988569970635
     pub fn check(&mut self, socket: &UdpSocket) -> Result<(), Error> {
         let build_opts = BuildOptions {
             target: Some(self.target),
