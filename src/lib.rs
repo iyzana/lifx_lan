@@ -1,16 +1,12 @@
 mod bulb;
+mod client;
 mod refreshable_data;
 
 pub use bulb::Bulb;
+use client::Client;
 
-pub fn start() -> Bulb {
-    Bulb::new(0, 0, "[::1]:80".parse().unwrap())
-}
-
-#[cfg(test)]
-mod tests {
-    #[test]
-    fn it_works() {
-        assert_eq!(2 + 2, 4);
-    }
+pub fn start() -> Result<Client, failure::Error> {
+    let client = Client::new()?;
+    client.discover_lights()?;
+    Ok(client)
 }

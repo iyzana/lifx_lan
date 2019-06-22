@@ -7,3 +7,9 @@ edition = "2018"
 [dependencies]
 lifx-core = "0.2.0"
 failure = "0.1.5"
+log = "0.4.6"
+chrono = "0.4.6"
+get_if_addrs = "0.5.3"
+
+[[example]]
+name = "data"

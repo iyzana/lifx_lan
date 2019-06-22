@@ -1,7 +1,8 @@
 use failure::Error;
 use std::time::{Duration, Instant};
+use std::fmt;
 
-type BoxUpdateFn<T, O> = Box<dyn FnMut(&O, Option<&T>) -> Result<(), Error>>;
+type BoxUpdateFn<T, O> = Box<dyn FnMut(&O, Option<&T>) -> Result<(), Error> + Send>;
 
 pub(crate) struct RefreshableData<T, O> {
     data: Option<T>,
@@ -13,7 +14,7 @@ pub(crate) struct RefreshableData<T, O> {
 impl<T, O> RefreshableData<T, O> {
     pub(crate) fn with_config<F>(max_age: Duration, refresh: F) -> Self
     where
-        F: FnMut(&O, Option<&T>) -> Result<(), Error> + 'static,
+        F: FnMut(&O, Option<&T>) -> Result<(), Error> + Send + 'static,
     {
         Self {
             data: None,
@@ -38,4 +39,15 @@ impl<T, O> RefreshableData<T, O> {
     pub(crate) fn as_ref(&self) -> Option<&T> {
         self.data.as_ref()
     }
+
+    pub(crate) fn as_mut(&mut self) -> Option<&mut T> {
+        self.data.as_mut()
+    }
 }
+
+impl<T: fmt::Debug, O> fmt::Debug for RefreshableData<T, O> {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        write!(f, "RefreshableData {{ data: {:?}, last_updated: {:?} }}", self.data, self.last_updated)
+    }
+}
+
