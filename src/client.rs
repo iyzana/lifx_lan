@@ -123,6 +123,12 @@ impl Client {
                     bulb.power.update(power);
                 }
             }
+            Message::StateHostFirmware { version, .. } => {
+                bulb.host_firmware.update(version);
+            }
+            Message::StateWifiFirmware { version, .. } => {
+                bulb.wifi_firmware.update(version);
+            }
             _ => {}
         }
     }

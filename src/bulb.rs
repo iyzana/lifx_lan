@@ -52,13 +52,13 @@ pub(crate) struct RefreshOpts {
 
 impl Bulb {
     pub fn new(addr: SocketAddr, target: u64) -> Self {
-        let short = Duration::from_secs(15);
+        let short = Duration::from_secs(2);
         let long = Duration::from_secs(5 * 60); // 5 minutes
         Self {
             addr,
             target,
             name: RefreshableData::with_config(long, move |refresh_opts, _| {
-                Self::request_update(refresh_opts, Message::GetPower)
+                Self::request_update(refresh_opts, Message::GetLabel)
             }),
             power: RefreshableData::with_config(short, move |refresh_opts, _| {
                 Self::request_update(refresh_opts, Message::GetPower)

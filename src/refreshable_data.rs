@@ -27,6 +27,7 @@ impl<T, O> RefreshableData<T, O> {
     pub(crate) fn check(&mut self, opts: &O) -> Result<(), Error> {
         if self.data.is_none() || self.last_updated.elapsed() > self.max_age {
             (self.refresh)(opts, self.data.as_ref())?;
+            self.last_updated = Instant::now();
         }
 
         Ok(())
@@ -34,6 +35,7 @@ impl<T, O> RefreshableData<T, O> {
 
     pub(crate) fn update(&mut self, data: T) {
         self.data = Some(data);
+        self.last_updated = Instant::now();
     }
 
     pub(crate) fn as_ref(&self) -> Option<&T> {
