@@ -2,13 +2,16 @@ use crate::bulb::{self, Bulb};
 use chrono::prelude::*;
 use get_if_addrs::*;
 use lifx_core::{get_product_info, BuildOptions, LifxIdent, LifxString, Message, RawMessage};
-use log::warn;
+use log::{info, warn};
 use std::{
     collections::HashMap,
     net::UdpSocket,
     sync::{Arc, Mutex},
     thread,
 };
+
+// random unique client identifier
+pub const CLIENT_IDENTIFIER: u32 = 646_994_787;
 
 type BulbMap = Arc<Mutex<HashMap<u64, Bulb>>>;
 
@@ -35,10 +38,7 @@ impl Client {
 
     pub fn discover_lights(&self) -> Result<(), failure::Error> {
         let opts = BuildOptions::default();
-        let msg = RawMessage::build(&opts, Message::GetService)
-            .unwrap()
-            .pack()
-            .unwrap();
+        let msg = RawMessage::build(&opts, Message::GetService)?.pack()?;
 
         get_if_addrs()
             .expect("could not list interfaces")
@@ -48,6 +48,7 @@ impl Client {
                 _ => None,
             })
             .filter(|if_addr| !if_addr.ip.is_loopback())
+            .inspect(|if_addr| info!("discovering bulbs on {}", if_addr.ip))
             .filter_map(|if_addr| if_addr.broadcast)
             .map(|broadcast| {
                 self.socket.send_to(&msg, (broadcast, 56700))?;
@@ -70,7 +71,7 @@ impl Client {
                         let bulb = bulbs
                             .entry(raw.frame_addr.target)
                             .and_modify(|bulb: &mut Bulb| bulb.addr = addr)
-                            .or_insert_with(|| Bulb::new(addr, raw.frame_addr.target));
+                            .or_insert_with(|| Bulb::new(addr, socket.try_clone().unwrap(), raw.frame_addr.target));
 
                         match Message::from_raw(&raw) {
                             Ok(msg) => Self::handle_message(bulb, msg),
