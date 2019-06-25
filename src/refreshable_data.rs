@@ -1,19 +1,24 @@
-use std::time::{Duration, Instant};
-use std::fmt;
 use lifx_core::Message;
+use std::fmt;
+use std::time::{Duration, Instant};
 
 type BoxUpdateFn<T> = Box<dyn FnMut(Option<&T>) -> Option<Message> + Send>;
 
-pub(crate) struct RefreshableData<T> where T: Clone {
+pub(crate) struct RefreshableData<T>
+where
+    T: Clone,
+{
     data: Option<T>,
     max_age: Option<Duration>,
     last_updated: Instant,
     refresh: BoxUpdateFn<T>,
 }
 
-impl<T> RefreshableData<T> where T: Clone {
-    pub(crate) fn with_config(max_age: Duration, message: Message) -> Self
-    {
+impl<T> RefreshableData<T>
+where
+    T: Clone,
+{
+    pub(crate) fn with_config(max_age: Duration, message: Message) -> Self {
         Self::with_dyn_config(max_age, move |_| Some(message.clone()))
     }
 
@@ -70,9 +75,15 @@ impl<T> RefreshableData<T> where T: Clone {
     }
 }
 
-impl<T: fmt::Debug> fmt::Debug for RefreshableData<T> where T: Clone {
+impl<T: fmt::Debug> fmt::Debug for RefreshableData<T>
+where
+    T: Clone,
+{
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        write!(f, "RefreshableData {{ data: {:?}, last_updated: {:?} }}", self.data, self.last_updated)
+        write!(
+            f,
+            "RefreshableData {{ data: {:?}, last_updated: {:?} }}",
+            self.data, self.last_updated
+        )
     }
 }
-

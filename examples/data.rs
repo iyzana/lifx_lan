@@ -9,7 +9,12 @@ fn main() -> Result<(), failure::Error> {
             bulb.check()?;
         }
         for bulb in client.bulbs.lock().unwrap().values() {
-            println!("{:?}: {:?} {:?}", bulb.name() , bulb.power(), bulb.color_single());
+            println!(
+                "{:?}: {:?} {:?}",
+                bulb.name(),
+                bulb.power(),
+                bulb.color_single()
+            );
         }
         std::thread::sleep(std::time::Duration::from_secs(3));
     }

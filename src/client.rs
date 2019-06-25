@@ -71,7 +71,9 @@ impl Client {
                         let bulb = bulbs
                             .entry(raw.frame_addr.target)
                             .and_modify(|bulb: &mut Bulb| bulb.addr = addr)
-                            .or_insert_with(|| Bulb::new(addr, socket.try_clone().unwrap(), raw.frame_addr.target));
+                            .or_insert_with(|| {
+                                Bulb::new(addr, socket.try_clone().unwrap(), raw.frame_addr.target)
+                            });
 
                         match Message::from_raw(&raw) {
                             Ok(msg) => Self::handle_message(bulb, msg),
