@@ -5,13 +5,13 @@ use lifx_core::{BuildOptions, Message, PowerLevel, RawMessage, HSBK};
 use std::net::{SocketAddr, UdpSocket};
 use std::time::Duration;
 
-#[derive(Debug)]
+#[derive(Clone, Debug)]
 pub enum Color {
     Single(Option<HSBK>),
     Multi(Vec<Option<HSBK>>),
 }
 
-#[derive(Debug)]
+#[derive(Clone, Debug)]
 pub struct Location {
     id: [u8; 16],
     name: String,
