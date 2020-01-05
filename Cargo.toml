@@ -1,7 +1,7 @@
 [package]
 name = "lifx-lan"
 version = "0.1.0"
-authors = ["succcubbus <jannis.kaiser2@gmail.com"]
+authors = ["iyzana"]
 edition = "2018"
 
 [dependencies]
